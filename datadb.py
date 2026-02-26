@@ -11,7 +11,8 @@ from langchain.docstore.document import Document
 dotenv.load_dotenv()
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-FAISS_PATH = r"C:\workAI\2_project\vector_store"
+FAISS_PATH = os.path.join(BASE_DIR, "vector_store")
+os.makedirs(FAISS_PATH, exist_ok=True)
 CACHE_DIR = os.path.join(BASE_DIR, "cache")
 
 os.makedirs(FAISS_PATH, exist_ok=True)

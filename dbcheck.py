@@ -1,7 +1,7 @@
 # ============================
 # data_db_check.py (캐시 텍스트 저장 기능 추가)
 # ============================
-
+import re
 import os
 from datadb import (
     FAISS_PATH,
@@ -97,9 +97,14 @@ def check_crawling_quality(min_length=300):
             text = get_cached_or_crawl(url)
             length = len(text)
 
-            # 캐시 내용 저장
-            safe_name = url.replace("://", "_").replace("/", "_")
+            def safe_filename(url: str) -> str:
+                # Windows에서 허용되지 않는 문자 제거
+                return re.sub(r'[\\/*?:"<>|]', '_', url)
+
+            # 캐시 저장할 때
+            safe_name = safe_filename(url)
             outfile = os.path.join(OUTPUT_DIR, safe_name + ".txt")
+
             with open(outfile, "w", encoding="utf-8") as f:
                 f.write(text)
 
