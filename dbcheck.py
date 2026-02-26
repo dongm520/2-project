@@ -1,8 +1,12 @@
 # ============================
-# data_db_check.py (캐시 텍스트 저장 기능 추가)
+# data_db_check.py (RSS 분석 기능 추가 버전)
 # ============================
+
 import re
 import os
+import requests
+import xml.etree.ElementTree as ET
+
 from datadb import (
     FAISS_PATH,
     load_vector_db,
@@ -14,10 +18,44 @@ from datadb import (
 OUTPUT_DIR = "cache_inspection_output"
 os.makedirs(OUTPUT_DIR, exist_ok=True)
 
+RSS_FEEDS = [
+    "https://www.hankyung.com/feed/all-news",
+]
+
+# ------------------------------------------------------
 def print_sep(title):
     print("\n" + "=" * 60)
     print(title)
     print("=" * 60)
+
+# ------------------------------------------------------
+# RSS 파싱 (feedparser 없이)
+# ------------------------------------------------------
+def parse_rss(feed_url):
+    try:
+        headers = {"User-Agent": "Mozilla/5.0"}
+        res = requests.get(feed_url, headers=headers, timeout=10)
+        res.raise_for_status()
+
+        root = ET.fromstring(res.content)
+        items = []
+
+        for item in root.findall(".//item"):
+            title = item.findtext("title", default="")
+            link = item.findtext("link", default="")
+            description = item.findtext("description", default="")
+
+            items.append({
+                "title": title.strip(),
+                "link": link.strip(),
+                "description": description.strip()
+            })
+
+        return items
+
+    except Exception as e:
+        print(f"❗ RSS 파싱 실패: {feed_url} → {e}")
+        return []
 
 # ------------------------------------------------------
 # 1) 캐시 파일 목록 조회 + 내용 저장
@@ -82,8 +120,12 @@ def show_target_urls():
         for url in urls:
             print("  └", url)
 
+    print("\n[RSS FEEDS]")
+    for rss in RSS_FEEDS:
+        print("  └", rss)
+
 # ------------------------------------------------------
-# 5) 크롤링 품질 점검 + 캐시 저장
+# 5) 기존 사이트 크롤링 품질 점검
 # ------------------------------------------------------
 def check_crawling_quality(min_length=300):
     print_sep("📌 [5] 크롤링 품질 점검 (내용 부족 URL 탐지)")
@@ -97,12 +139,7 @@ def check_crawling_quality(min_length=300):
             text = get_cached_or_crawl(url)
             length = len(text)
 
-            def safe_filename(url: str) -> str:
-                # Windows에서 허용되지 않는 문자 제거
-                return re.sub(r'[\\/*?:"<>|]', '_', url)
-
-            # 캐시 저장할 때
-            safe_name = safe_filename(url)
+            safe_name = re.sub(r'[\\/*?:"<>|]', '_', url)
             outfile = os.path.join(OUTPUT_DIR, safe_name + ".txt")
 
             with open(outfile, "w", encoding="utf-8") as f:
@@ -119,10 +156,39 @@ def check_crawling_quality(min_length=300):
     print(f"정상 URL: {len(good_urls)}개")
     print(f"내용 부족 URL: {len(bad_urls)}개")
 
-    if bad_urls:
-        print("\n❗ 내용 부족 URL 목록:")
-        for url, length in bad_urls:
-            print(f"- {url} ({length} chars)")
+# ------------------------------------------------------
+# 6) RSS 품질 점검 + 기사 본문 활용
+# ------------------------------------------------------
+def check_rss_quality(min_length=300):
+    print_sep("📌 [6] RSS 분석 점검")
+
+    for feed_url in RSS_FEEDS:
+        print(f"\n🔎 RSS: {feed_url}")
+        items = parse_rss(feed_url)
+
+        if not items:
+            print("❗ RSS 항목 없음")
+            continue
+
+        print(f"✔ RSS 기사 수: {len(items)}개")
+
+        for item in items:
+            link = item["link"]
+            title = item["title"]
+
+            article_text = get_cached_or_crawl(link)
+            length = len(article_text)
+
+            safe_name = re.sub(r'[\\/*?:"<>|]', '_', link)
+            outfile = os.path.join(OUTPUT_DIR, safe_name + ".txt")
+
+            with open(outfile, "w", encoding="utf-8") as f:
+                f.write(article_text)
+
+            if length < min_length:
+                print(f"❗ 내용 부족 ({length} chars): {title}")
+            else:
+                print(f"✔ 정상 ({length} chars): {title}")
 
 # ------------------------------------------------------
 # 전체 실행
@@ -134,6 +200,7 @@ def run_all_checks():
     inspect_vector_db()
     show_target_urls()
     check_crawling_quality(min_length=300)
+    check_rss_quality(min_length=300)
     print_sep("🔍 점검 완료")
 
 
