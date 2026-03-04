@@ -73,7 +73,7 @@ if menu == "💬 분석 챗봇":
     # 기본 질문 자동 입력
     default_question = category_prompts[selected_category]
 
-    q = st.text_input("질문을 입력하세요.", value=default_question)
+    q = st.text_input("질문을 입력하세요", value=default_question)
 
 #########
     if st.button("분석 요청"):
