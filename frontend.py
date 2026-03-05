@@ -263,10 +263,37 @@ def tab4():
 
 
 # ============================================
-# Menu
+# Menu (버튼을 메뉴 바로 아래로 이동한 버전)
 # ============================================
-menu = st.sidebar.radio("메뉴", ["자동 보고서", "챗봇", "다운로드", "디버깅 로그"])
+def reset_all_logs():
+    keys = [
+        "tab1_answer", "tab1_summary", "tab1_pdf",
+        "tab2_history", "stats"
+    ]
+    for k in keys:
+        if k in st.session_state:
+            del st.session_state[k]
 
+
+# ============================================
+with st.sidebar:
+    st.title("🧊 국내 취업 동향 분석")
+
+    with st.expander("분석 카테고리", expanded=True):
+        menu = st.radio(
+            "",
+            ["자동 보고서", "챗봇", "다운로드", "디버깅 로그"],
+            label_visibility="collapsed"
+        )
+
+    st.markdown("---")
+
+    if st.button("🔄 모든 로그 초기화"):
+        reset_all_logs()
+        st.success("세션 초기화 완료!")
+
+
+# ▼ 메뉴 선택 처리
 if menu == "자동 보고서":
     tab1()
 elif menu == "챗봇":
@@ -275,3 +302,4 @@ elif menu == "다운로드":
     tab3()
 elif menu == "디버깅 로그":
     tab4()
+
