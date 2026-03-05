@@ -1,0 +1,67 @@
+{
+    "file_name": "employ.csv",
+    "row_count": 36,
+    "column_count": 6,
+    "columns": [
+        {
+            "name": "보험연도",
+            "dtype": "object",
+            "sample_values": [
+                "2022",
+                "2022",
+                "2022"
+            ],
+            "null_count": 0
+        },
+        {
+            "name": "구분",
+            "dtype": "object",
+            "sample_values": [
+                "20세 미만",
+                "20~24세",
+                "25~29세"
+            ],
+            "null_count": 0
+        },
+        {
+            "name": "남자(명)",
+            "dtype": "int64",
+            "sample_values": [
+                "42808",
+                "279223",
+                "868775"
+            ],
+            "null_count": 0
+        },
+        {
+            "name": " 여자(명)",
+            "dtype": "int64",
+            "sample_values": [
+                "51396",
+                "398944",
+                "831530"
+            ],
+            "null_count": 0
+        },
+        {
+            "name": " 전체대비비율(남자) ",
+            "dtype": "float64",
+            "sample_values": [
+                "0.3",
+                "1.94",
+                "6.02"
+            ],
+            "null_count": 0
+        },
+        {
+            "name": " 전체대비비율(여자) ",
+            "dtype": "float64",
+            "sample_values": [
+                "0.36",
+                "2.76",
+                "5.76"
+            ],
+            "null_count": 0
+        }
+    ]
+}

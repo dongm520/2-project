@@ -1,0 +1,15 @@
+{
+    "total_files": 2,
+    "datasets": [
+        {
+            "file_name": "economy.xlsx",
+            "rows": 10,
+            "columns": 105
+        },
+        {
+            "file_name": "employ.csv",
+            "rows": 36,
+            "columns": 6
+        }
+    ]
+}
