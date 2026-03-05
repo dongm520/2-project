@@ -118,8 +118,28 @@ def tab1():
 # ============================================
 # Tab2 (Streaming)
 # ============================================
+
+
+# [수아 추가] 시작1
+
 def tab2():
     st.title("💬 실시간 스트리밍 챗봇")
+
+    # ---------------------------
+    # 🔽 챗봇 내부 카테고리 선택 UI
+    # ---------------------------
+    st.subheader("📊 분석 카테고리 선택")
+    chat_category = st.selectbox(
+        "어떤 분석을 진행할까요?",
+        ["국내 취업 동향", "산업별 고용 통계", "청년 고용 시장", "맞춤형 직무 분석", "기타"],
+        key="chat_category"
+    )
+    st.write(f"선택된 카테고리: **{chat_category}**")
+    st.markdown("---")
+
+
+# [수아 추가] 끝2
+
 
     for role, msg in st.session_state.tab2_history:
         with st.chat_message(role):
@@ -276,6 +296,8 @@ def reset_all_logs():
 
 
 # ============================================
+
+# 수아 수정 2
 with st.sidebar:
     st.title("🧊 국내 취업 동향 분석")
 
