@@ -26,7 +26,7 @@ TAVILY_KEY = os.getenv("TAVILY_API_KEY")
 OPENAI_KEY = os.getenv("OPENAI_API_KEY")
 
 tavily = TavilyClient(api_key=TAVILY_KEY)
-llm = ChatOpenAI(model="gpt-3.5-turbo", api_key=OPENAI_KEY)
+llm = ChatOpenAI(model="gpt-4o-mini", api_key=OPENAI_KEY)
 embeddings = OpenAIEmbeddings(model="text-embedding-3-small", api_key=OPENAI_KEY)
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))

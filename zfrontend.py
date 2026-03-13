@@ -122,7 +122,7 @@ def display_sources(sources):
     has_none = any(not s.get("title") or s.get("title") == "None" for s in sources)
     named = [s for s in sources if s.get("title") and s.get("title") != "None"]
 
-   # 동일 title 중복 제거
+    # 동일 title 중복 제거
     seen = set()
     deduped = []
     for s in named:
@@ -269,7 +269,7 @@ with tab_trend:
             quick_query_trend = (
                 f"최근 {date_range} 기간 정보를 바탕으로 현재 가장 주목받고 있는 유망 직종 3가지를 분석해줘. "
                 f"각 직종별로 성장 배경, 필요 역량, 평균 연봉 수준을 포함해서 5줄 이내로 요약해서 설명해줘."
-    )
+            )
     with col3:
         if st.button("🎓 신입 채용 시장 전망"):
             quick_query_trend = f"{date_range}동안 신입 사원 채용 시장의 전망과 준비 전략을 요약해서 알려줘."
@@ -281,17 +281,33 @@ with tab_trend:
         st.divider()
 
     messages_trend = st.session_state.messages_trend
-    for message in messages_trend:
-        with st.chat_message(message["role"]):
-            st.markdown(message["content"])
-
-    if messages_trend and messages_trend[-1]["role"] == "assistant":
-        display_sources(st.session_state.rag_sources)
 
     trend_input = st.chat_input("질문을 입력하거나 위 버튼을 눌러주세요.", key="chat_input_trend")
     final_query_trend = trend_input or quick_query_trend
+
     if final_query_trend:
-        run_chat_stream(messages_trend, final_query_trend, selected_days)
+        with st.spinner("잡나비가 분석 중입니다..."):
+            run_chat_stream(messages_trend, final_query_trend, selected_days)
+    else:
+        # 최신 질문 + 답변 맨 위
+        if len(messages_trend) >= 2:
+            with st.chat_message("user"):
+                st.markdown(messages_trend[-2]["content"])
+            with st.chat_message("assistant"):
+                st.markdown(messages_trend[-1]["content"])
+            display_sources(st.session_state.rag_sources)
+        elif messages_trend and messages_trend[-1]["role"] == "assistant":
+            with st.chat_message("assistant"):
+                st.markdown(messages_trend[-1]["content"])
+            display_sources(st.session_state.rag_sources)
+
+        # 이전 대화 시간순
+        if len(messages_trend) > 2:
+            st.divider()
+            st.caption("이전 대화")
+            for message in messages_trend[:-2]:
+                with st.chat_message(message["role"]):
+                    st.markdown(message["content"])
 
 # ---------------------------------------------------------------
 # 탭 2: 개인 맞춤 취업대비
