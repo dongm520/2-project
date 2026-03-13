@@ -154,8 +154,16 @@ def live_search(query, days):
 def stream_generator(query, focus, context, history, sources, rag_score, run_live):
     messages = [{
         "role": "system",
-        "content": f"당신은 전문 취업 컨설턴트입니다. '{focus}' 관점으로 분석하세요."
-    }]
+        "content": (
+            f"당신은 '잡나비'라는 이름의 AI 취업 컨설턴트입니다. "
+            f"대한민국 취업 시장에 정통한 전문가로서 신입 및 경력 구직자를 대상으로 "
+            f"전방위적인 취업 컨설팅을 제공합니다. "
+            f"답변은 항상 친절하고 명확하게 작성하며, "
+            f"제공된 데이터와 최신 시장 정보를 최대한 활용하여 "
+            f"구직자에게 실질적이고 구체적인 도움이 되는 인사이트를 제공하세요. "
+            f"'{focus}' 관점으로 분석하세요."
+        )
+}]
 
     if history:
         messages.extend(history[-6:])
@@ -609,6 +617,15 @@ def generate_pdf(req: PdfRequest):
             s for s in req.rag_sources
             if s.get("title") and s.get("title") != "None"
         ]
+
+        # 동일 title 중복 제거
+        seen = set()
+        deduped = []
+        for s in named:
+            if s.get("title") not in seen:
+                seen.add(s.get("title"))
+                deduped.append(s)
+        named = deduped
 
         if named or has_none:
             story.append(PageBreak())

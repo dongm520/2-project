@@ -1,5 +1,5 @@
 # frontend.py
-# Streamlit 렌더링만 담당 — 비즈니스 로직은 모두 백엔드 처리
+# Streamlit 렌더링 - UI 관리
 
 import streamlit as st
 import requests
@@ -14,7 +14,7 @@ from dotenv import load_dotenv
 load_dotenv()
 
 st.set_page_config(
-    page_title="일기일회 취업 컨설턴트",
+    page_title="Job Navi 취업 컨설턴트",
     layout="wide",
     page_icon="🤖"
 )
@@ -109,7 +109,7 @@ def render_main_chart():
     )
     fig.update_yaxes(title_text="취업자 (천명)", secondary_y=False)
     fig.update_yaxes(title_text="고용률 (%)", secondary_y=True)
-    st.plotly_chart(fig, use_container_width=True)
+    st.plotly_chart(fig, width="stretch")
 
 
 # ===============================================================
@@ -121,6 +121,15 @@ def display_sources(sources):
 
     has_none = any(not s.get("title") or s.get("title") == "None" for s in sources)
     named = [s for s in sources if s.get("title") and s.get("title") != "None"]
+
+   # 동일 title 중복 제거
+    seen = set()
+    deduped = []
+    for s in named:
+        if s.get("title") not in seen:
+            seen.add(s.get("title"))
+            deduped.append(s)
+    named = deduped
 
     lines = []
     for s in named:
@@ -233,7 +242,7 @@ with st.sidebar:
 # ===============================================================
 # 메인 타이틀
 # ===============================================================
-st.title("💼 일기일회 취업 컨설턴트")
+st.title("💼 Job Navi 취업 컨설턴트")
 st.caption(f"현재 설정된 데이터 수집 범위: 최근 {date_range}")
 
 # ===============================================================
@@ -392,10 +401,10 @@ with tab_recruit:
                 st.link_button(
                     "💼 사람인에서 검색",
                     f"https://www.saramin.co.kr/zf_user/search/recruit?searchword={job_encoded}",
-                    use_container_width=True
+                    width="stretch"
                 )
                 if os.path.exists("images/사람인.avif"):
-                    st.image("images/사람인.avif", use_container_width=True)
+                    st.image("images/사람인.avif", width="stretch")
 
         with col2:
             _, center, _ = st.columns([1, 2, 1])
@@ -403,10 +412,10 @@ with tab_recruit:
                 st.link_button(
                     "💼 잡코리아에서 검색",
                     f"https://www.jobkorea.co.kr/Search/?stext={job_encoded}",
-                    use_container_width=True
+                    width="stretch"
                 )
                 if os.path.exists("images/잡코리아.avif"):
-                    st.image("images/잡코리아.avif", use_container_width=True)
+                    st.image("images/잡코리아.avif", width="stretch")
 
         with col3:
             _, center, _ = st.columns([1, 2, 1])
@@ -414,10 +423,10 @@ with tab_recruit:
                 st.link_button(
                     "💼 원티드에서 검색",
                     f"https://www.wanted.co.kr/search?query={job_encoded}",
-                    use_container_width=True
+                    width="stretch"
                 )
                 if os.path.exists("images/원티드.png"):
-                    st.image("images/원티드.png", use_container_width=True)
+                    st.image("images/원티드.png", width="stretch")
 
 # ---------------------------------------------------------------
 # 탭 4: 유튜브 영상 추천
